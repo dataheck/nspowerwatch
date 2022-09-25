@@ -37,7 +37,8 @@ impl CustomerOutages for MyOutageServiceServer {
         let (tx, rx) = mpsc::channel(4);
 
         // todo: this is not actually async yet
-        let all_outages = match outages::table.load::<Outages>(&mut connection) {
+        // I believe this sorting will make plotting more efficient on the client-side.
+        let all_outages = match outages::table.order((outages::area_name, outages::datetime.asc())).load::<Outages>(&mut connection) {
             Ok(r) => r,
             Err(e) => {
                 error!("Error loading outages: {}", e);
