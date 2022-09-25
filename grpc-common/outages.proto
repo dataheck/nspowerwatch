@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package outages;
+import "google/protobuf/timestamp.proto";
+
+service CustomerOutages {
+    rpc ListOutages(ListOutagesRequest) returns (stream OutageStreamItem);
+}
+
+message ListOutagesRequest { }
+message OutageStreamItem {
+    string area_name = 1;
+    int64 outages = 2;
+    google.protobuf.Timestamp datetime = 3;
+}

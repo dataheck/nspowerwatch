@@ -1,0 +1,20 @@
+[package]
+name = "nspower-watch"
+version = "0.1.0"
+authors = ["Matthew Scheffel <matt@dataheck.com>"]
+edition = "2021"
+
+[workspace]
+members = [
+    "acquisition", # how we get data into our database
+    "backend",     # database handling
+    "grpc",        # GRPC server
+    "wasm",        # handles GRPC communication between browser and server
+]
+
+[dependencies]
+
+
+[profile.release.package.wasm]
+# optimize for size
+opt-level = "s" 
