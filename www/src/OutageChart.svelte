@@ -45,30 +45,7 @@
                 legend: {
                     display: true,
                     position: 'bottom',
-                    // https://stackoverflow.com/a/42633650
-                    onHover: function(event, legendItem) {
-                        var options = this.options || {};
-                        var hoverOptions = options.hover || {};
-                        var ci = this.chart;
-                        hoveredDatasetIndex = legendItem.datasetIndex;
-                        ci.updateHoverStyle(ci.getDatasetMeta(hoveredDatasetIndex).data, hoverOptions.mode, true);
-                        ci.render();
-                    }
-                },
-                tooltips: {
-                    mode: 'index',
-                    intersect: false,
-                    custom: function(tooltip) {
-                        if (hoveredDatasetIndex != -1) {
-                        var options = this.options || {};
-                        var hoverOptions = options.hover || {};
-                        var ci = this._chartInstance.chart.controller;
-                        ci.updateHoverStyle(ci.getDatasetMeta(hoveredDatasetIndex).data, hoverOptions.mode, false);
-                        hoveredDatasetIndex = -1;
-                        ci.render();
-                        }
-                    }
-                },        	
+                },     	
             },
             scales: {
                 x: {
