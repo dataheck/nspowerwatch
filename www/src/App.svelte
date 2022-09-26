@@ -54,7 +54,9 @@
 		associated with Nova Scotia Power and this information is provided with no guarantee of its accuracy,
 		completeness, reliability, or usefulness.
 	</p>
-	<canvas id="myChart" height="30vw" width="80vw"></canvas>
+	<div class="chart-container" style="position: relative; height:80vh; width: 80vw">
+		<canvas id="myChart"></canvas>
+	</div>
 	{#await promise}
 		<Loading/>
 	{:then result}
