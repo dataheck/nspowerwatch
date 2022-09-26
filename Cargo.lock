@@ -433,6 +433,7 @@ dependencies = [
  "backend",
  "clap",
  "diesel",
+ "dotenv",
  "log",
  "prost",
  "prost-types",
