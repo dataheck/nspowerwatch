@@ -1,6 +1,7 @@
 <script>
-	export let bindings;
+	import Meta from 'svelte-meta';
 
+	export let bindings;
 	import Chart from 'chart.js/auto';
 
 	import {
@@ -15,17 +16,18 @@
 		HeaderNavItem,
 	} from 'carbon-components-svelte';
 
-    import OutageChart from './OutageChart.svelte';
-	import Meta from 'svelte-meta';
+    import OutageChart from './OutageChart.svelte';	
 
 	let isSideNavOpen = false;
-	let promise = bindings.get_outages();
 
+	let promise = bindings.get_outages();
 	function refreshData() {
 		const chart = Chart.getChart("myChart");
-		chart.destroy();
+		if (chart) {
+			chart.destroy();
+		}
 		promise = bindings.get_outages();
-	}
+	}	
 </script>
 <style>
 	canvas {
@@ -42,7 +44,6 @@
 		image: 'https://outages.dataheck.com/screenshot.png',
 	}}
 />
-
 <Header company="Power Outage Time Series" bind:isSideNavOpen>
 	<HeaderNav>
 		<HeaderNavItem href="https://www.dataheck.com" text="Made with ♥ in Amherst, NS by Matthew Scheffel" />
