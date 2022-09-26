@@ -32,7 +32,7 @@
 	}
 </style>
 <svelte:head>
-	<title>dataheck.com | Nova Scotia Power Outage Tracker</title>
+	<title>dataheck.com | Nova Scotia Outage Tracker</title>
 </svelte:head>
 
 <Header company="Power Outage Time Series" bind:isSideNavOpen>
@@ -54,7 +54,7 @@
 		associated with Nova Scotia Power and this information is provided with no guarantee of its accuracy,
 		completeness, reliability, or usefulness.
 	</p>
-	<canvas id="myChart" height="40vw" width="80vw"></canvas>
+	<canvas id="myChart" height="30vw" width="80vw"></canvas>
 	{#await promise}
 		<Loading/>
 	{:then result}
