@@ -1,6 +1,5 @@
+extern crate chrono;
 extern crate wee_alloc;
-
-use serde::{Serialize, Deserialize};
 
 pub mod types;
 
@@ -18,24 +17,29 @@ const BASE_URL: &str = "http://127.0.0.1:5000";
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-#[derive(Serialize, Deserialize, Clone, Copy)]
-struct OutagePoint {
-    datetime: NaiveDateTime,
-    outages: i64
-}
-
 #[wasm_bindgen]
 pub async fn get_outages() -> Result<JsValue, JsValue> {
     let mut query_client: CustomerOutagesClient<Client> = CustomerOutagesClient::new(Client::new(BASE_URL.to_owned()));
     let request: ListOutagesRequest = ListOutagesRequest{};
     let mut stream = query_client.list_outages(request).await.unwrap().into_inner();
 
-    let mut result: HashMap<String, Vec<OutagePoint>> = HashMap::new();
+    let mut all_datetimes = Vec::new();
+    let mut all_outages: HashMap<String, Vec<i64>> = HashMap::new();
+
     while let Some(outage) = stream.message().await.map_err(|e| e.message().to_owned())? {
-        let this_datetime = outage.datetime.unwrap();
-        let this_point = OutagePoint{datetime: NaiveDateTime::from_timestamp(this_datetime.seconds, 0), outages: outage.outages };
-        result.entry(outage.area_name).and_modify(|e| e.push(this_point)).or_insert(vec![this_point]);
+        let timestamp = { 
+            let grpc_format = outage.datetime.unwrap();
+            let this_ndatetime = NaiveDateTime::from_timestamp(grpc_format.seconds, 0);
+            this_ndatetime.timestamp()*1000
+        };
+
+        if !all_datetimes.contains(&timestamp) {
+            all_datetimes.push(timestamp);
+        }
+
+        all_outages.entry(outage.area_name).and_modify(|e| e.push(outage.outages)).or_insert(vec![outage.outages]);
     }
 
+    let result = (all_datetimes, all_outages);
     Ok(serde_wasm_bindgen::to_value(&result).unwrap())
 }

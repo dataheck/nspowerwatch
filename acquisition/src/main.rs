@@ -122,6 +122,7 @@ fn main() {
     match outages::table.filter(outages::datetime.eq(this_datetime)).count().get_result::<i64>(&mut connection) {
         // no data present, insert it
         Ok(0) => {
+            info!("Found directory that should contain data we don't have yet");
             let summary = fetch_summary(&directory).unwrap();
             let nova_scotia = summary.file_data.get("areas").unwrap().first().unwrap();
 
@@ -137,8 +138,9 @@ fn main() {
                     outages_list.push(NewOutage { datetime: this_datetime, area_name: area.area_name.to_owned(), customers_affected: area.cust_a.val })
                 }
             }
-
+            info!("Attempting insertion.");
             insert_into(outages::table).values(&outages_list).execute(&mut connection).unwrap();
+            info!("Data has been inserted.");
         },
         Ok(_count) => {
             info!("Data for datetime {} already in database.", this_datetime);
@@ -147,6 +149,4 @@ fn main() {
             panic!("Unable to fetch count of existing entries: {}", e)
         }
     }
-
-
 }

@@ -1,0 +1,32 @@
+{
+  "name": "svelte-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "start": "sirv public --no-clear"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.2.1",
+    "@wasm-tool/rollup-plugin-rust": "^2.3.1",
+    "carbon-components-svelte": "^0.70.9",
+    "rollup": "^2.3.4",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-svelte": "^7.0.0",
+    "rollup-plugin-terser": "^7.0.0",
+    "svelte": "^3.0.0"
+  },
+  "dependencies": {
+    "@sveltejs/pancake": "github:Rich-Harris/pancake",
+    "carbon-icons-svelte": "^11.3.0",
+    "chart.js": "^3.9.1",
+    "chartjs-adapter-date-fns": "^2.0.0",
+    "chartjs-plugin-colorschemes": "github:zsu/chartjs-plugin-colorschemes",
+    "date-fns": "^2.29.3",
+    "rollup-plugin-rust": "^1.2.0",
+    "sirv-cli": "^2.0.0"
+  }
+}
