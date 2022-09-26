@@ -1,6 +1,4 @@
 <script>
-	import Meta from 'svelte-meta';
-
 	export let bindings;
 	import Chart from 'chart.js/auto';
 
@@ -34,16 +32,15 @@
 		margin-top: 2em;
 	}
 </style>
-<Meta
-	title="Nova Scotia Outage Tracker"
-	description="Tracks outages across Nova Scotia through time"
-	openGraph={{
-		url: 'https://outages.dataheck.com',
-		title: "Nova Scotia Outage Tracker",
-		description: "Tracks outages across Nova Scotia through time",
-		image: 'https://outages.dataheck.com/screenshot.png',
-	}}
-/>
+
+<svelte:head>
+	<title>Nova Scotia Outage Tracker</title>
+	<meta name="description" content="Tracks outages across Nova Scotia through time" />
+	<meta name="og:title" content="Nova Scotia Outage Tracker" />
+	<meta name="og:description" content="Tracks outages across Nova Scotia through time" />
+	<meta name="og:image" content="https://outages.dataheck.com/screenshot.png" />
+</svelte:head>
+
 <Header company="Power Outage Time Series" bind:isSideNavOpen>
 	<HeaderNav>
 		<HeaderNavItem href="https://www.dataheck.com" text="Made with ♥ in Amherst, NS by Matthew Scheffel" />
