@@ -62,10 +62,10 @@
 		associated with Nova Scotia Power and this information is provided with no guarantee of its accuracy,
 		completeness, reliability, or usefulness.
 	</p>
+	<br/>
 	<p>
 		Click a region in the legend below to hide all other series. The largest series at the top will always be 
-		all of Nova Scotia. As of this writing, the colours are not gaurenteed to be unique across series; they're 
-		randomly generated on each refresh.
+		all of Nova Scotia. As of this writing, the colours might be similar between series. 
 	</p>
 	<div class="chart-container" style="position: relative; height:80vh; width: 80vw">
 		<canvas id="myChart"></canvas>
