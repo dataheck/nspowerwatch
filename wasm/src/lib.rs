@@ -11,7 +11,7 @@ use wasm_bindgen::prelude::*;
 use types::outages::ListOutagesRequest;
 use types::outages::customer_outages_client::CustomerOutagesClient;
 
-const BASE_URL: &str = "http://outages.dataheck.com:5000";
+const BASE_URL: &str = "https://outages.dataheck.com:5000";
 
 // Use `wee_alloc` as the global allocator.
 #[global_allocator]
