@@ -41,9 +41,6 @@
 		description: "Tracks outages across Nova Scotia through time",
 		image: 'https://outages.dataheck.com/screenshot.png',
 	}}
-	twitter={{
-		handle: '@confirmsignal',
-	}}
 />
 
 <Header company="Power Outage Time Series" bind:isSideNavOpen>

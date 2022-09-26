@@ -17,10 +17,17 @@
 	}
 	
     let colormap = new Map();
+    let used_colors = new Set();
     let datasets = [];
     outages[1].forEach((value, key, map) => {
         if (!colormap.has(key)) {
-            colormap.set(key, getRandomColor())
+            // ensure unique colours
+            let color_try = getRandomColor();
+            while (used_colors.has(color_try)) {
+                color_try = getRandomColor();
+            }
+            used_colors.add(color_try)
+            colormap.set(key, color_try)
         } 
         let color = colormap.get(key)
         
