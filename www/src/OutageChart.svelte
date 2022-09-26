@@ -6,28 +6,29 @@
     let ctx = document.getElementById("myChart").getContext("2d");
 
     // https://stackoverflow.com/a/67659413
-	function getRandomColor() { //generates random colours and puts them in string
+    let used_colors = new Set();
+	function getRandomColour() { //generates random colours and puts them in string
 		var letters = '0123456789ABCDEF'.split('');
-		var color = '#';
-		for (var x = 0; x < 6; x++) {
-			color += letters[Math.floor(Math.random() * 16)];
-		}
+		
+        // ensure unique colours
+        var color = '#00a0a0';
+        while (used_colors.has(color)) {
+            color = "#"
+            for (var x = 0; x < 6; x++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+        }
+        used_colors.add(color)
 	
 		return color;
 	}
 	
     let colormap = new Map();
-    let used_colors = new Set();
+    
     let datasets = [];
     outages[1].forEach((value, key, map) => {
         if (!colormap.has(key)) {
-            // ensure unique colours
-            let color_try = getRandomColor();
-            while (used_colors.has(color_try)) {
-                color_try = getRandomColor();
-            }
-            used_colors.add(color_try)
-            colormap.set(key, color_try)
+            colormap.set(key, getRandomColour())
         } 
         let color = colormap.get(key)
         
