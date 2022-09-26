@@ -45,7 +45,7 @@
                     display: true,
                     position: 'bottom',
                     onHover: function(event, legendItem) {
-                        document.getElementById("canvas").style.cursor = 'pointer';
+                        document.getElementById("myChart").style.cursor = 'pointer';
                     },
                     onClick: function(e, legendItem) {
                         var index = legendItem.datasetIndex;
