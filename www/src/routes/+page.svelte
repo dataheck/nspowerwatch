@@ -9,22 +9,28 @@
 		SideNav, 
         SideNavItems,
 		SideNavLink,
+		SideNavDivider,
 		HeaderNavItem,
 	} from 'carbon-components-svelte';
     import "carbon-components-svelte/css/g10.css";
 
     import Chart from 'chart.js/auto/auto.mjs';
     import OutageChart from './OutageChart.svelte';	
+	import ChartControls from './ChartControls.svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 
     let isSideNavOpen = false;
+
+	let promise = init().then(function() {
+		return get_outages()
+	});
 
     function refreshData() {
 		const chart = Chart.getChart("myChart");
 		if (chart) {
 			chart.destroy();
 		}
-		return get_outages()
+		promise = get_outages()
 	}
 </script>
 
@@ -62,8 +68,14 @@
 </Header>
 <SideNav bind:isOpen={isSideNavOpen}>
 	<SideNavItems>
-		<!--SideNavLink text="Refresh Data" on:click={refreshData} /-->
+		<SideNavLink text="Refresh Data" on:click={refreshData} />
 		<SideNavLink text="Contact" href="https://www.dataheck.com" />
+		<SideNavDivider />
+		{#await promise}
+			<Loading/>
+		{:then}
+			<ChartControls />
+		{/await}
 	</SideNavItems>
 </SideNav>
 <Content>	
@@ -82,13 +94,9 @@
 	<div class="chart-container" style="position: relative; height:80vh; width: 80vw">
 		<canvas id="myChart"></canvas>
 	</div>
-    {#await init()}
-        <Loading/>
-        {:then}
-            {#await refreshData()}
-                <Loading/>
-            {:then result}
-                <OutageChart outages={result} />
-            {/await}
-    {/await}
+	{#await promise}
+		<Loading/>
+	{:then result}
+		<OutageChart outages={result} />
+	{/await}
 </Content>
