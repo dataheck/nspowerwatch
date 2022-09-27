@@ -87,6 +87,9 @@
                 }, 	
             },
             scales: {
+                y: {
+                    beginAtZero: true
+                },
                 x: {
                     type: 'time',
                     time: {
