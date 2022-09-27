@@ -1,9 +1,8 @@
 <script>
-    import Chart from 'chart.js/auto';
+    import Chart from 'chart.js/auto/auto.mjs';
+    import 'date-fns';
     import 'chartjs-adapter-date-fns';
-    
     export let outages;
-    let ctx = document.getElementById("myChart").getContext("2d");
 
     // https://stackoverflow.com/a/67659413
     let used_colors = new Set();
@@ -41,6 +40,7 @@
         })
     });
 
+    let ctx = document.getElementById("myChart");
     const chartInstance = new Chart(ctx, {
         type: "line",
         data: {
