@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "vite build && tar zcf C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\target\\www.tgz --directory=C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\www\\build *",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
