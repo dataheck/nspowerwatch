@@ -26,6 +26,7 @@
 	});
 
     function refreshData() {
+		selected = 'All Nova Scotia';
 		const chart = Chart.getChart("myChart");
 		if (chart) {
 			chart.destroy();
