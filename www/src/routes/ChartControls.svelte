@@ -38,7 +38,14 @@
         chart?.update();    
     }
 </script>
+<style>
+    #locationSelections {
+        text-transform: capitalize;
+    }
+</style>
 <SideNavLink text="All Nova Scotia" on:click={showAll} />
-{#each locations as location}
-    <SideNavLink text="{location}" on:click={() => {selectLocation(location)}} />
-{/each}
+<div id="locationSelections">
+    {#each locations as location}
+        <SideNavLink text="{location.toLowerCase()}" on:click={() => {selectLocation(location)}} />
+    {/each}
+</div>
