@@ -32,6 +32,8 @@
 		}
 		promise = get_outages()
 	}
+
+	let selected = 'All Nova Scotia';
 </script>
 
 <style>
@@ -73,8 +75,8 @@
 		<SideNavDivider />
 		{#await promise}
 			<Loading/>
-		{:then}
-			<ChartControls />
+		{:then result}
+			<ChartControls outages={result} bind:selected={selected} />
 		{/await}
 	</SideNavItems>
 </SideNav>
@@ -91,7 +93,9 @@
 		Click a region in the legend below to hide all other series. The largest series at the top will always be 
 		all of Nova Scotia. As of this writing, the colours might be similar between different locations. 
 	</p>
-	<div class="chart-container" style="position: relative; height:80vh; width: 80vw">
+	<br/>
+	<h2>{selected}</h2>
+	<div class="chart-container" style="position: relative; height:65vh; width: 80vw">
 		<canvas id="myChart"></canvas>
 	</div>
 	{#await promise}
