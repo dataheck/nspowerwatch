@@ -1,13 +1,12 @@
 extern crate chrono;
 extern crate wee_alloc;
 
-pub mod types;
-
 use chrono::NaiveDateTime;
 use std::collections::HashMap;
 use tonic_web_wasm_client::Client;
 use wasm_bindgen::prelude::*;
 
+pub mod types;
 use types::outages::ListOutagesRequest;
 use types::outages::customer_outages_client::CustomerOutagesClient;
 
