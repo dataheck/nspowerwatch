@@ -46,6 +46,6 @@
 <SideNavLink text="All Nova Scotia" on:click={showAll} />
 <div id="locationSelections">
     {#each locations as location}
-        <SideNavLink text="{location.toLowerCase()}" on:click={() => {selectLocation(location)}} />
+        <SideNavLink text="{location.toLowerCase()}" on:click={async () => {selectLocation(location)}} />
     {/each}
 </div>
