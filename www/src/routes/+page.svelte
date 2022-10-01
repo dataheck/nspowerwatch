@@ -11,8 +11,9 @@
 		SideNavLink,
 		SideNavDivider,
 		HeaderNavItem,
+		Theme
 	} from 'carbon-components-svelte';
-    import "carbon-components-svelte/css/g10.css";
+	import "carbon-components-svelte/css/all.css";
 
     import Chart from 'chart.js/auto/auto.mjs';
     import OutageChart from './OutageChart.svelte';	
@@ -36,6 +37,10 @@
 
 	let selected = 'All Nova Scotia';
 </script>
+
+<Theme
+	theme="g10"
+/>
 
 <style>
 	canvas {margin-top: 2em;}
