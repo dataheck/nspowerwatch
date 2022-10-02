@@ -3,8 +3,9 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build && tar zcf C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\target\\www.tgz --directory=C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\www\\build *",
+		"dev": "wasm-pack build --target web --dev ..\\wasm && vite dev",
+		"build": "wasm-pack build --target web ..\\wasm && vite build && tar zcf C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\target\\www.tgz --directory=C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\www\\build *",
+		"deploy": "scp C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\target\\www.tgz dataheck.com:~/deploy/nspowerwatch",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
