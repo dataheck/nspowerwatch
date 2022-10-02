@@ -10,7 +10,10 @@ pub mod types;
 use types::outages::ListOutagesRequest;
 use types::outages::customer_outages_client::CustomerOutagesClient;
 
-const BASE_URL: &str = "https://outages.dataheck.com:5000";
+const BASE_URL: &str = match cfg!(debug_assertions) {
+    false => "https://outages.dataheck.com:5000",
+    true => "http://127.0.0.1:5000"
+};
 
 // Use `wee_alloc` as the global allocator.
 #[global_allocator]
