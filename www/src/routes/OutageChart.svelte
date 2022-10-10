@@ -51,7 +51,10 @@
         options: {
             animation: false,
             parsing: false,
-            //normalized: true,
+            interaction: {
+                mode: 'nearest',
+                intersect: false
+            },
             plugins: {
                 legend: {
                     display: false,
