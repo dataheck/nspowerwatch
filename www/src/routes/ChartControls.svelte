@@ -5,7 +5,7 @@
     export let outages;
     export let selected;
 
-    let locations = [...outages[1].keys()];
+    let locations = [...outages.keys()];
     let data_index = new Map();
     for (let i = 0; i < locations.length; i++) {
         data_index.set(locations[i], i)

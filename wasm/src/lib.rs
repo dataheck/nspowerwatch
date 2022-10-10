@@ -3,6 +3,8 @@ extern crate wee_alloc;
 
 use chrono::NaiveDateTime;
 use std::collections::HashMap;
+use std::collections::hash_map::Entry;
+use serde::{Serialize, Deserialize};
 use tonic_web_wasm_client::Client;
 use wasm_bindgen::prelude::*;
 
@@ -20,13 +22,20 @@ const BASE_URL: &str = match cfg!(debug_assertions) {
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
+#[derive(Serialize, Deserialize)]
+struct Point {
+    pub x: i64,
+    pub y: i64
+}
+
+#[wasm_bindgen]
 pub async fn get_outages() -> Result<JsValue, JsValue> {
     let mut query_client: CustomerOutagesClient<Client> = CustomerOutagesClient::new(Client::new(BASE_URL.to_owned()));
     let request: ListOutagesRequest = ListOutagesRequest{};
     let mut stream = query_client.list_outages(request).await.unwrap().into_inner();
 
     let mut all_datetimes = Vec::new();
-    let mut all_outages: HashMap<String, Vec<i64>> = HashMap::new();
+    let mut all_outages: HashMap<String, Vec<Point>> = HashMap::new();
 
     while let Some(outage) = stream.message().await.map_err(|e| e.message().to_owned())? {
         let timestamp = { 
@@ -39,9 +48,10 @@ pub async fn get_outages() -> Result<JsValue, JsValue> {
             all_datetimes.push(timestamp);
         }
 
-        all_outages.entry(outage.area_name).and_modify(|e| e.push(outage.outages)).or_insert(vec![outage.outages]);
+        all_outages.entry(outage.area_name)
+            .and_modify(|e| e.push(Point{x: timestamp, y: outage.outages}))
+            .or_insert(vec![Point{x: timestamp, y: outage.outages}]);
     }
 
-    let result = (all_datetimes, all_outages);
-    Ok(serde_wasm_bindgen::to_value(&result).unwrap())
+    Ok(serde_wasm_bindgen::to_value(&all_outages).unwrap())
 }

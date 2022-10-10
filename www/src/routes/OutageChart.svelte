@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import Chart from 'chart.js/auto/auto.mjs';
     import 'date-fns';
     import 'chartjs-adapter-date-fns';
@@ -24,8 +24,8 @@
 	
     let colormap = new Map();
     
-    let datasets = [];
-    outages[1].forEach((value, key, map) => {
+    let datasets: object[] = [];
+    outages.forEach((value: object[], key: string, _map: any) => {
         if (!colormap.has(key)) {
             colormap.set(key, getRandomColour())
         } 
@@ -37,6 +37,8 @@
             borderColor: color,
             backgroundColor: color,
             fill: false,
+            radius: 0,
+            borderWidth: 2
         })
     });
 
@@ -44,17 +46,21 @@
     const chartInstance = new Chart(ctx, {
         type: "line",
         data: {
-            labels: outages[0],
-            datasets: datasets
-        },
+            datasets: datasets,
+        },        
         options: {
-            /*animation: {
-                duration: 0,
-            },*/
+            animation: false,
+            parsing: false,
+            //normalized: true,
             plugins: {
                 legend: {
                     display: false,
                 },
+                decimation: {
+                    enabled: true,
+                    algorithm: "lttb", // min-max or lttb
+                    samples: 50
+                }
             },
             scales: {
                 y: {
@@ -62,6 +68,11 @@
                 },
                 x: {
                     type: 'time',
+                    ticks: {
+                        source: 'auto',
+                        maxRotation: 0,
+                        autoSkip: true,
+                    },
                     time: {
                         unit: 'day',
                     }
