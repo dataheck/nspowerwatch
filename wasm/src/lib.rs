@@ -3,7 +3,6 @@ extern crate wee_alloc;
 
 use chrono::NaiveDateTime;
 use std::collections::HashMap;
-use std::collections::hash_map::Entry;
 use serde::{Serialize, Deserialize};
 use tonic_web_wasm_client::Client;
 use wasm_bindgen::prelude::*;

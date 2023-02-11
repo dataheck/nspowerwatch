@@ -5,6 +5,7 @@ use dotenv::dotenv;
 use log::info;
 use std::env;
 use tonic::transport::{Identity, Server, ServerTlsConfig};
+use tonic_web::GrpcWebLayer;
 
 use backend::get_database_url;
 
@@ -53,7 +54,8 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
     Server::builder()
         //.accept_http1(true)
         .tls_config(ServerTlsConfig::new().identity(identity))?
-        .add_service(tonic_web::enable(CustomerOutagesServer::new(outage_service_state)))
+        .layer(GrpcWebLayer::new())
+        .add_service(CustomerOutagesServer::new(outage_service_state))
         .serve(addr)
         .await?;
 
