@@ -2,7 +2,8 @@ use clap::Parser;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool};
 use dotenv::dotenv;
-use http::header::HeaderValue;
+use http::header::{HeaderValue, HeaderName};
+
 use log::info;
 use std::env;
 use tonic::transport::{Identity, Server, ServerTlsConfig};
@@ -36,6 +37,14 @@ pub fn get_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
         .expect("Could not build connection pool")
 }
 
+const DEFAULT_EXPOSED_HEADERS: [&str; 3] = [
+    "grpc-status", "grpc-message", "grpc-status-details-bin"
+];
+
+const DEFAULT_ALLOW_HEADERS: [&str; 7] = [
+    "x-grpc-web", "content-type", "x-user-agent", "grpc-timeout", "origin", "host", "x-requested-with"
+];
+
 #[tokio::main]
 async fn main()  -> Result<(), Box<dyn std::error::Error>> {
     simple_logger::init_with_level(log::Level::Info).unwrap();
@@ -59,7 +68,21 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
         false => "https://outages.dataheck.com".parse::<HeaderValue>().unwrap(),
     }; 
 
-    let cors = CorsLayer::new().allow_origin(allow_origin);
+    let cors = CorsLayer::new()
+        .allow_origin(allow_origin).expose_headers(
+            DEFAULT_EXPOSED_HEADERS
+                .iter()
+                .cloned()
+                .map(HeaderName::from_static)
+                .collect::<Vec<HeaderName>>(),
+        )
+        .allow_headers(
+            DEFAULT_ALLOW_HEADERS
+                .iter()
+                .cloned()
+                .map(HeaderName::from_static)
+                .collect::<Vec<HeaderName>>(),
+        );
 
     Server::builder()
         .accept_http1(true)
