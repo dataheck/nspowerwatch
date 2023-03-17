@@ -2,10 +2,12 @@ use clap::Parser;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool};
 use dotenv::dotenv;
+use http::header::HeaderValue;
 use log::info;
 use std::env;
 use tonic::transport::{Identity, Server, ServerTlsConfig};
 use tonic_web::GrpcWebLayer;
+use tower_http::cors::CorsLayer;
 
 use backend::get_database_url;
 
@@ -52,9 +54,17 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
 
     let outage_service_state = MyOutageServiceServer{pool: pool.clone()};    
 
+    let allow_origin = match cfg!(debug_assertions) {
+        true => "http://eqsplit.local:8000".parse::<HeaderValue>().unwrap(), // i.e.: trunk via local-ssl-proxy
+        false => "https://outages.dataheck.com".parse::<HeaderValue>().unwrap(),
+    }; 
+
+    let cors = CorsLayer::new().allow_origin(allow_origin);
+
     Server::builder()
-        //.accept_http1(true)
+        .accept_http1(true)
         .tls_config(ServerTlsConfig::new().identity(identity))?
+        .layer(cors)
         .layer(GrpcWebLayer::new())
         .add_service(CustomerOutagesServer::new(outage_service_state))
         .serve(addr)
