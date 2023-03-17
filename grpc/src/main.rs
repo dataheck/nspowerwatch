@@ -40,7 +40,8 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
     let matches = CLIArgs::parse();
     let addr = format!("{}:{}", matches.grpc_address, matches.grpc_port).parse()?;
 
-    dotenv().ok();
+    dotenv().expect("Unable to load .env file.");
+
     let cert = (tokio::fs::read(env::var("CERT_PATH").expect("CERT_PATH must be set")).await).expect("CERT_PATH specified, but does not exist.");
     let key = (tokio::fs::read(env::var("KEY_PATH").expect("KEY_PATH must be set")).await).expect("KEY_PATH specified, but does not exist.");
     let identity = Identity::from_pem(cert, key);

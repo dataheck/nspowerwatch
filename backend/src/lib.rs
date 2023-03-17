@@ -11,7 +11,7 @@ pub mod schema;
 pub mod models;
 
 pub fn get_database_url() -> String {
-    dotenv().ok();
+    dotenv().expect("Unable to load .env file.");
     env::var("DATABASE_URL").expect("DATABASE_URL must be set")
 }
 
