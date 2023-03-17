@@ -48,14 +48,19 @@ impl CustomerOutages for MyOutageServiceServer {
 
         tokio::spawn(async move {
             for outage in &all_outages {
-                tx.send(Ok(OutageStreamItem{
+                let result = tx.send(Ok(OutageStreamItem{
                     area_name: outage.area_name.clone(),
                     outages: outage.customers_affected,
                     datetime: Some(Timestamp{
                         seconds: outage.datetime.timestamp(),
                         nanos: 0
                     })
-                })).await.unwrap();
+                })).await;
+
+                if result.is_err() {
+                    error!("Error sending outage: {:?}", result);
+                    break;
+                }
             }            
         });        
 
