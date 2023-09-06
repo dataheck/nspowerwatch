@@ -39,7 +39,7 @@ pub async fn get_outages() -> Result<JsValue, JsValue> {
     while let Some(outage) = stream.message().await.map_err(|e| e.message().to_owned())? {
         let timestamp = { 
             let grpc_format = outage.datetime.unwrap();
-            let this_ndatetime = NaiveDateTime::from_timestamp(grpc_format.seconds, 0);
+            let this_ndatetime = NaiveDateTime::from_timestamp_opt(grpc_format.seconds, 0).unwrap();
             this_ndatetime.timestamp()*1000
         };
 
