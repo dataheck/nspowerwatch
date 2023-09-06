@@ -1,3 +1,4 @@
+use chrono::{Duration, Utc};
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use log::error;
@@ -36,9 +37,11 @@ impl CustomerOutages for MyOutageServiceServer {
 
         let (tx, rx) = mpsc::channel(4);
 
+        let earliest_data = Utc::now().naive_utc() - Duration::days(90);
+
         // todo: this is not actually async yet
         // I believe this sorting will make plotting more efficient on the client-side.
-        let all_outages = match outages::table.order((outages::area_name, outages::datetime.asc())).load::<Outages>(&mut connection) {
+        let all_outages = match outages::table.filter(outages::datetime.gt(earliest_data)).order((outages::area_name, outages::datetime.asc())).load::<Outages>(&mut connection) {
             Ok(r) => r,
             Err(e) => {
                 error!("Error loading outages: {}", e);

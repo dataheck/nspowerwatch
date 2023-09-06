@@ -6,6 +6,7 @@ authors = ["Matthew Scheffel <matt@dataheck.com>"]
 
 [dependencies]
 clap = { version = "4.1", features = ["derive"] }
+chrono = "0.4.24"
 backend = { path = "../backend" }
 diesel = { version = "2.0", features = ["postgres", "chrono", "r2d2"] }
 dotenv = "0.15.0"
