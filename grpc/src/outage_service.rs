@@ -11,7 +11,7 @@ fn get_connection_from_pool(pool: &Pool<ConnectionManager<PgConnection>>) -> Res
     match pool.get() {
         Ok(c) => Ok(c),
         Err(e) => {
-            error!("Unable to obtain datbase connection: {:?}", e);
+            error!("Unable to obtain database connection: {:?}", e);
             Err(Status::resource_exhausted("No database connections are available."))
         }
     }

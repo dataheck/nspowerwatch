@@ -3,9 +3,9 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"livedev": "wasm-pack build --target web ..\\wasm && npm install && vite dev",
-		"dev": "wasm-pack build --target web --dev ..\\wasm && npm install && vite dev",
-		"build": "wasm-pack build --target web ..\\wasm && npm install && vite build && tar zcf C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\target\\www.tgz --directory=C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\www\\build *",
+		"livedev": "wasm-pack build --target web ../wasm && npm install && vite dev",
+		"dev": "wasm-pack build --target web --dev ../wasm && npm install && vite dev",
+		"build": "wasm-pack build --target web ../wasm && npm install && vite build && tar zcf C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\target\\www.tgz --directory=C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\www\\build *",
 		"deploy": "scp C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\target\\www.tgz dataheck.com:~/deploy/nspowerwatch",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -33,10 +33,11 @@
 		"vite": "^3.1.0",
 		"vite-plugin-top-level-await": "^1.1.1",
 		"vite-plugin-wasm": "^3.0.0",
-		"wasm": "C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\wasm\\pkg"
+		"wasm": "../wasm/pkg"
 	},
 	"type": "module",
 	"dependencies": {
-		"chart.js": "^3.9.1"
+		"chart.js": "^3.9.1",
+		"wasm-pack": "^0.12.1"
 	}
 }
