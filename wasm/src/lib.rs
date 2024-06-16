@@ -1,7 +1,7 @@
 extern crate chrono;
 extern crate wee_alloc;
 
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 use tonic_web_wasm_client::Client;
@@ -37,9 +37,10 @@ pub async fn get_outages() -> Result<JsValue, JsValue> {
     let mut all_outages: HashMap<String, Vec<Point>> = HashMap::new();
 
     while let Some(outage) = stream.message().await.map_err(|e| e.message().to_owned())? {
-        let timestamp = { 
+        let timestamp: i64 = { 
             let grpc_format = outage.datetime.unwrap();
-            let this_ndatetime = NaiveDateTime::from_timestamp_opt(grpc_format.seconds, 0).unwrap();
+            let this_ndatetime = DateTime::<Utc>::from_timestamp(grpc_format.seconds, grpc_format.nanos as u32).unwrap();
+            
             this_ndatetime.timestamp()*1000
         };
 

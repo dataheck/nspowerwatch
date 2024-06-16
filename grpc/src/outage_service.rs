@@ -41,7 +41,7 @@ impl CustomerOutages for MyOutageServiceServer {
 
         // todo: this is not actually async yet
         // I believe this sorting will make plotting more efficient on the client-side.
-        let all_outages = match outages::table.filter(outages::datetime.gt(earliest_data)).order((outages::area_name, outages::datetime.asc())).load::<Outages>(&mut connection) {
+        let all_outages: Vec<Outages>  = match outages::table.filter(outages::datetime.gt(earliest_data)).order((outages::area_name, outages::datetime.asc())).load::<Outages>(&mut connection) {
             Ok(r) => r,
             Err(e) => {
                 error!("Error loading outages: {}", e);
@@ -55,7 +55,7 @@ impl CustomerOutages for MyOutageServiceServer {
                     area_name: outage.area_name.clone(),
                     outages: outage.customers_affected,
                     datetime: Some(Timestamp{
-                        seconds: outage.datetime.timestamp(),
+                        seconds: outage.datetime.and_utc().timestamp(),
                         nanos: 0
                     })
                 })).await;
