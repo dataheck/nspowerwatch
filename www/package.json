@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"livedev": "wasm-pack build --target web ../wasm && npm install && vite dev",
-		"dev": "wasm-pack build --target web --dev ../wasm && npm install && vite dev",
+		"dev": "wasm-pack build --target web --dev ../wasm && npm install && vite --port 8080 --host snakeoil.local dev",
 		"build": "wasm-pack build --target web ../wasm && npm install && vite build && tar zcf C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\target\\www.tgz --directory=C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\www\\build *",
 		"deploy": "scp C:\\Users\\Matt\\Documents\\Development\\Rust\\nspower-watch\\target\\www.tgz dataheck.com:~/deploy/nspowerwatch",
 		"preview": "vite preview",

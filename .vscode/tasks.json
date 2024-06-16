@@ -1,0 +1,49 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "$(book) Docs",
+            "type": "shell",
+            "presentation": {
+                "reveal": "silent",
+            },
+            "command": "cargo doc --open --workspace"
+        },        
+        {
+            "label": "$(lock) SSL Proxy",
+            "type": "shell",
+            "command": "local-ssl-proxy --hostname snakeoil.local --source 8000 --target 8080 --cert snakeoil.local.pem --key snakeoil.local-key.pem",
+            "presentation": {
+                "group": "WWW"
+            }
+        },
+        {
+            "label": "$(browser) run dev",
+            "type": "shell",
+            "command": "npm run dev",
+            "options": {
+                "cwd": "${workspaceFolder}/www",
+            },
+            "presentation": {
+                "group": "WWW",
+            }
+        },
+        {
+            "label": "$(server-process) GRPC Backend",
+            "type": "shell",
+            "command": "cargo run",
+            "options": {
+                "cwd": "${workspaceFolder}/grpc"
+            },
+            "presentation": {
+                "group": "Backend"
+            },
+            "dependsOn": ["$(database) Wipe DB"]
+        },
+        {
+            "label": "$(database) Wipe DB",
+            "type": "shell",
+            "command": "diesel migration redo -a",
+        }
+    ]
+}
