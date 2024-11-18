@@ -1,13 +1,14 @@
+use std::env;
+use std::time::Duration;
+
 use clap::Parser;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool};
 use dotenv::dotenv;
 use http::header::{HeaderValue, HeaderName};
-
 use log::info;
-use std::env;
-use tonic::transport::{Identity, Server, ServerTlsConfig};
 use tonic_web::GrpcWebLayer;
+use tonic::transport::{Identity, Server, ServerTlsConfig};
 use tower_http::cors::CorsLayer;
 
 use backend::get_database_url;
@@ -57,6 +58,11 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
     let key = (tokio::fs::read(env::var("KEY_PATH").expect("KEY_PATH must be set")).await).expect("KEY_PATH specified, but does not exist.");
     let identity = Identity::from_pem(cert, key);
 
+    let timeout_secs: u64 = match env::var("TIMEOUT_SECS") {
+        Ok(val) => val.parse().expect("TIMEOUT_SECS must be a number."),
+        Err(_) => 30,
+    };
+
     info!("Server started. gRPC listening at {}", addr);
 
     let pool = get_connection_pool();
@@ -85,6 +91,7 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
         );
 
     Server::builder()
+        .timeout(Duration::from_secs(timeout_secs))
         .accept_http1(true)
         .tls_config(ServerTlsConfig::new().identity(identity))?
         .layer(cors)
