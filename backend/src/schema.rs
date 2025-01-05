@@ -1,4 +1,6 @@
-table! {
+// @generated automatically by Diesel CLI.
+
+diesel::table! {
     outages (id) {
         id -> Int8,
         datetime -> Timestamp,

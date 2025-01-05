@@ -1,12 +1,19 @@
 use std::env;
-use std::time::Duration;
+use std::fs;
+use std::time::{Duration, SystemTime};
 
 use clap::Parser;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool};
 use dotenv::dotenv;
+use futures::FutureExt;
 use http::header::{HeaderValue, HeaderName};
-use log::info;
+use log::{error, info};
+use tokio::{
+    time::sleep,
+    task,
+    sync::oneshot,
+};
 use tonic_web::GrpcWebLayer;
 use tonic::transport::{Identity, Server, ServerTlsConfig};
 use tower_http::cors::CorsLayer;
@@ -41,10 +48,22 @@ pub fn get_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
 const DEFAULT_EXPOSED_HEADERS: [&str; 3] = [
     "grpc-status", "grpc-message", "grpc-status-details-bin"
 ];
-
 const DEFAULT_ALLOW_HEADERS: [&str; 7] = [
     "x-grpc-web", "content-type", "x-user-agent", "grpc-timeout", "origin", "host", "x-requested-with"
 ];
+
+const MAINTENANCE_SLEEP_PERIOD: Duration = Duration::from_secs(60);
+
+fn check_tls_files() -> (SystemTime, SystemTime) {
+    let cert_path = env::var("CERT_PATH").expect("CERT_PATH must be set");
+    let key_path = env::var("KEY_PATH").expect("KEY_PATH must be set");
+
+    let cert_modified = fs::metadata(cert_path).unwrap().modified().unwrap();
+    let key_modified = fs::metadata(key_path).unwrap().modified().unwrap();
+
+    (cert_modified, key_modified)
+}
+
 
 #[tokio::main]
 async fn main()  -> Result<(), Box<dyn std::error::Error>> {
@@ -90,6 +109,27 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
                 .collect::<Vec<HeaderName>>(),
         );
 
+    let (shutdown_tx, shutdown_rx) = oneshot::channel::<()>();
+
+    // task for periodic maintenance
+    // 1. if the TLS certificate has changed, and if so, shutdown. we'll be restarted.
+    let local = task::LocalSet::new();
+    local.run_until(async move {
+        let (cert_modified, key_modified) = check_tls_files();
+
+        task::spawn_local(async move {
+            loop {
+                if check_tls_files() != (cert_modified, key_modified) {
+                    shutdown_tx.send(()).unwrap();
+                    error!("TLS certificate or key has changed, shutting down.");
+                    break;
+                }
+
+                sleep(MAINTENANCE_SLEEP_PERIOD).await;
+            }
+        }).await.unwrap();
+    }).await;
+
     Server::builder()
         .timeout(Duration::from_secs(timeout_secs))
         .accept_http1(true)
@@ -97,7 +137,7 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
         .layer(cors)
         .layer(GrpcWebLayer::new())
         .add_service(CustomerOutagesServer::new(outage_service_state))
-        .serve(addr)
+        .serve_with_shutdown(addr, shutdown_rx.map(|_| ()))
         .await?;
 
     Ok(())

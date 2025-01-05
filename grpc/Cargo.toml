@@ -5,13 +5,14 @@ edition = "2021"
 authors = ["Matthew Scheffel <matt@dataheck.com>"]
 
 [dependencies]
-clap = { version = "4.1", features = ["derive"] }
-chrono = "0.4.24"
 backend = { path = "../backend" }
+chrono = "0.4.24"
+clap = { version = "4.1", features = ["derive"] }
 diesel = { version = "2.0", features = ["postgres", "chrono", "r2d2"] }
 dotenv = "0.15.0"
-log = "0.4"
+futures = "0.3"
 http = "0.2"
+log = "0.4"
 prost = "0.12"
 prost-types = "0.12"
 simple_logger = "5.0"
