@@ -82,8 +82,6 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
         Err(_) => 30,
     };
 
-    info!("Server started. gRPC listening at {}", addr);
-
     let pool = get_connection_pool();
 
     let outage_service_state = MyOutageServiceServer{pool: pool.clone()};    
@@ -114,7 +112,7 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
     // task for periodic maintenance
     // 1. if the TLS certificate has changed, and if so, shutdown. we'll be restarted.
     let local = task::LocalSet::new();
-    local.run_until(async move {
+    let maintenance_task = local.run_until(async move {
         let (cert_modified, key_modified) = check_tls_files();
 
         task::spawn_local(async move {
@@ -128,17 +126,26 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
                 sleep(MAINTENANCE_SLEEP_PERIOD).await;
             }
         }).await.unwrap();
-    }).await;
+    });
 
-    Server::builder()
+    let server_task = Server::builder()
         .timeout(Duration::from_secs(timeout_secs))
         .accept_http1(true)
         .tls_config(ServerTlsConfig::new().identity(identity))?
         .layer(cors)
         .layer(GrpcWebLayer::new())
         .add_service(CustomerOutagesServer::new(outage_service_state))
-        .serve_with_shutdown(addr, shutdown_rx.map(|_| ()))
-        .await?;
+        .serve_with_shutdown(addr, shutdown_rx.map(|_| ()));
+
+    info!("Server starting; gRPC listening at {}", addr);
+    tokio::select!{
+        res = server_task => {
+            if let Err(e) = res {
+                error!("Server task completed with an error: {}", e)
+            }
+        },
+        _res = maintenance_task => {}
+    }
 
     Ok(())
 }
