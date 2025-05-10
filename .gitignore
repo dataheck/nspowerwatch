@@ -4,3 +4,4 @@
 .kreya
 *.tgz
 *.pem
+/bin
