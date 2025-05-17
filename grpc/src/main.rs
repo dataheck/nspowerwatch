@@ -19,6 +19,7 @@ use tonic::transport::{Identity, Server, ServerTlsConfig};
 use tower_http::cors::CorsLayer;
 
 use backend::get_database_url;
+use drop_root::drop_privileges;
 
 pub mod types;
 pub mod outage_service;
@@ -65,51 +66,19 @@ fn check_tls_files() -> (SystemTime, SystemTime) {
     (cert_modified, key_modified)
 }
 
-#[link(name = "c")]
-extern "C" {
-    fn geteuid() -> usize;
-    fn getegid() -> usize;
-    fn setuid(uid: usize) -> isize;
-    fn setgid(gid: usize) -> isize;
-}
-
-
 #[tokio::main]
 async fn main()  -> Result<(), Box<dyn std::error::Error>> {
     simple_logger::init_with_level(log::Level::Info).unwrap();
+
+    drop_privileges();
+
     let matches = CLIArgs::parse();
     let addr = format!("{}:{}", matches.grpc_address, matches.grpc_port).parse()?;
 
     dotenv().expect("Unable to load .env file.");
 
-    // we might need root privileges for these steps. standard certbot deployments are root-only.    
     let cert = (tokio::fs::read(env::var("CERT_PATH").expect("CERT_PATH must be set")).await).expect("CERT_PATH specified, but does not exist.");
     let key = (tokio::fs::read(env::var("KEY_PATH").expect("KEY_PATH must be set")).await).expect("KEY_PATH specified, but does not exist.");
-
-    // there is no reason for us to have root privileges beyond this point, drop them.
-    unsafe {
-        if getegid() == 0 || geteuid() == 0 { 
-            info!("Root privileges discovered, dropping them.");
-            let new_uid = match env::var("RUNAS_USERID") {
-                Ok(u) => u.parse().unwrap(),
-                Err(_) => 1000,
-            };
-
-            let new_gid = match env::var("RUNAS_GROUPID") {
-                Ok(u) => u.parse().unwrap(),
-                Err(_) => new_uid,
-            };
-
-            assert!(setgid(new_gid) == 0, "Unable to drop group privileges.");
-            assert!(setuid(new_uid) == 0, "Unable to drop user privileges.");
-
-            assert!(setuid(0) != 0, "Reclaiming root worked after dropping privileges, that's a nope.");
-
-            assert!(getegid() != 0 && geteuid() != 0, "Root privileges still detected.");
-            
-            info!("Root privileges successfully dropped, this process is unable to regain them.")
-        }
-    }
 
     let identity = Identity::from_pem(cert, key);
 

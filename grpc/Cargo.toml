@@ -10,6 +10,7 @@ chrono = "0.4.24"
 clap = { version = "4.1", features = ["derive"] }
 diesel = { version = "2.0", features = ["postgres", "chrono", "r2d2"] }
 dotenv = "0.15.0"
+drop-root = { git = "ssh://gitea/dataheck/drop-root.git" }
 futures = "0.3"
 http = "0.2"
 log = "0.4"
