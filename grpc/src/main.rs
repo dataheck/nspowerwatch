@@ -69,8 +69,8 @@ fn check_tls_files() -> (SystemTime, SystemTime) {
 extern "C" {
     fn geteuid() -> usize;
     fn getegid() -> usize;
-    fn seteuid(euid: usize) -> isize;
-    fn setegid(egid: usize) -> isize;
+    fn setuid(uid: usize) -> isize;
+    fn setgid(gid: usize) -> isize;
 }
 
 
@@ -100,12 +100,14 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
                 Err(_) => new_uid,
             };
 
-            assert!(setegid(new_gid) == 0, "Unable to drop group privileges.");
-            assert!(seteuid(new_uid) == 0, "Unable to drop user privileges.");
+            assert!(setgid(new_gid) == 0, "Unable to drop group privileges.");
+            assert!(setuid(new_uid) == 0, "Unable to drop user privileges.");
 
-            assert!(seteuid(0) != -1, "Reclaiming root worked after dropping privileges, that's a nope.");
+            assert!(setuid(0) != 0, "Reclaiming root worked after dropping privileges, that's a nope.");
 
-            assert!(getegid() != 0 && geteuid() != 0, "Root privileges still detected.")
+            assert!(getegid() != 0 && geteuid() != 0, "Root privileges still detected.");
+            
+            info!("Root privileges successfully dropped, this process is unable to regain them.")
         }
     }
 
