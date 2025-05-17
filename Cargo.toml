@@ -12,9 +12,6 @@ members = [
     "wasm",        # handles GRPC communication between browser and server
 ]
 
-[dependencies]
-
-
 [profile.release.package.wasm]
 # optimize for size
 opt-level = "s" 

@@ -39,6 +39,7 @@ struct CLIArgs {
 pub fn get_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
     let url = get_database_url();
     let manager = ConnectionManager::<PgConnection>::new(url);
+    
     Pool::builder()
         .test_on_check_out(true)
         .build(manager)
@@ -64,6 +65,14 @@ fn check_tls_files() -> (SystemTime, SystemTime) {
     (cert_modified, key_modified)
 }
 
+#[link(name = "c")]
+extern "C" {
+    fn geteuid() -> usize;
+    fn getegid() -> usize;
+    fn seteuid(euid: usize) -> isize;
+    fn setegid(egid: usize) -> isize;
+}
+
 
 #[tokio::main]
 async fn main()  -> Result<(), Box<dyn std::error::Error>> {
@@ -73,8 +82,33 @@ async fn main()  -> Result<(), Box<dyn std::error::Error>> {
 
     dotenv().expect("Unable to load .env file.");
 
+    // we might need root privileges for these steps. standard certbot deployments are root-only.    
     let cert = (tokio::fs::read(env::var("CERT_PATH").expect("CERT_PATH must be set")).await).expect("CERT_PATH specified, but does not exist.");
     let key = (tokio::fs::read(env::var("KEY_PATH").expect("KEY_PATH must be set")).await).expect("KEY_PATH specified, but does not exist.");
+
+    // there is no reason for us to have root privileges beyond this point, drop them.
+    unsafe {
+        if getegid() == 0 || geteuid() == 0 { 
+            info!("Root privileges discovered, dropping them.");
+            let new_uid = match env::var("RUNAS_USERID") {
+                Ok(u) => u.parse().unwrap(),
+                Err(_) => 1000,
+            };
+
+            let new_gid = match env::var("RUNAS_GROUPID") {
+                Ok(u) => u.parse().unwrap(),
+                Err(_) => new_uid,
+            };
+
+            assert!(setegid(new_gid) == 0, "Unable to drop group privileges.");
+            assert!(seteuid(new_uid) == 0, "Unable to drop user privileges.");
+
+            assert!(seteuid(0) != -1, "Reclaiming root worked after dropping privileges, that's a nope.");
+
+            assert!(getegid() != 0 && geteuid() != 0, "Root privileges still detected.")
+        }
+    }
+
     let identity = Identity::from_pem(cert, key);
 
     let timeout_secs: u64 = match env::var("TIMEOUT_SECS") {
