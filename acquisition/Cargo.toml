@@ -10,6 +10,7 @@ authors = ["Matthew Scheffel <matt@dataheck.com>"]
 backend = { path = "../backend" }
 chrono = { version = "0.4" }
 diesel = { version = "2.0", features = ["postgres", "chrono", "r2d2"] }
+drop-root = { git = "ssh://gitea/dataheck/drop-root.git" }
 log = "0.4"
 reqwest = {version = "0.12", features = ["blocking"] } 
 serde = { version = "1.0", features = ["derive"] }

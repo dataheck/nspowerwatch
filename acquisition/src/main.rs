@@ -114,6 +114,9 @@ fn main() {
     use backend::schema::outages;
 
     SimpleLogger::new().init().unwrap();
+
+    drop_root::drop_privileges();
+
     let directory = fetch_directory().unwrap();
     let this_datetime = filename_to_datetime(&directory).unwrap();
 

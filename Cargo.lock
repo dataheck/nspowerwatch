@@ -9,6 +9,7 @@ dependencies = [
  "backend",
  "chrono",
  "diesel",
+ "drop-root",
  "log",
  "reqwest",
  "serde",

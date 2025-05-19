@@ -19,7 +19,6 @@ use tonic::transport::{Identity, Server, ServerTlsConfig};
 use tower_http::cors::CorsLayer;
 
 use backend::get_database_url;
-use drop_root::drop_privileges;
 
 pub mod types;
 pub mod outage_service;
@@ -70,7 +69,7 @@ fn check_tls_files() -> (SystemTime, SystemTime) {
 async fn main()  -> Result<(), Box<dyn std::error::Error>> {
     simple_logger::init_with_level(log::Level::Info).unwrap();
 
-    drop_privileges();
+    drop_root::drop_privileges();
 
     let matches = CLIArgs::parse();
     let addr = format!("{}:{}", matches.grpc_address, matches.grpc_port).parse()?;
